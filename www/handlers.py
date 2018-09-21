@@ -4,7 +4,11 @@ import  logging
 
 @get('/')
 async def index(request):
-    return '<h1>Awesome</h1>'
+    users= await  User.findAll()
+    return {
+        '__template__':'index.html',
+        'users':users
+    }
 
 @get('/author')
 async def author(request):

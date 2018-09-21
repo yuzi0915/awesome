@@ -21,7 +21,7 @@ def init_jinja2(app,**kw):
     )
     path = kw.get('path',None)
     if path is None:
-        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'temlates')
+        path = os.path.join(os.path.dirname(os.path.abspath(__file__)),'templates')
     logging.info('set jinja template path:%s'%path)
     env = Environment(loader=FileSystemLoader(path),**options)
     filters = kw.get('filters',None)
@@ -70,7 +70,7 @@ async def  response_factory(app,handler):
                 resp.content_type = 'application/json;'
                 return resp
             else:
-                resp = web.Response(body = app['__templating__'].get_temlate(template).render(**r).encode('utf-8'))
+                resp = web.Response(body = app['__templating__'].get_template(template).render(**r).encode('utf-8'))
                 resp.content_type = 'text/html;charset = utf-8'
                 return resp
         if isinstance(r,int) and r >= 100 and r < 600:

@@ -25,8 +25,8 @@ async def select(sql,args,size =None):
     log(sql)
     global __pool
     async with __pool.get() as conn:
-        async with conn.curor(aiomysql.DictCursor) as cur:
-            await cur.execute(sql.repace('?','%s'),args or ())
+        async with conn.cursor(aiomysql.DictCursor) as cur:
+            await cur.execute(sql.replace('?','%s'),args or ())
             if size:
                 rs = await cur.fetchmany(size)
             else:
