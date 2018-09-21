@@ -86,7 +86,7 @@ async def  response_factory(app,handler):
     return response
 
 def datetime_filter(t):
-    delta = init(time.time()-t)
+    delta = int(time.time()-t)
     if delta < 60:
         return u'1分钟前'
     if delta<3600:
