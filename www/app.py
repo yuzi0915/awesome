@@ -103,7 +103,7 @@ def index(request):
 
 
 async def init(loop):
-    await orm.create_pool(loop = loop,host='192.168.181.128',port=3306,user='root',password='zjbaaa',db='awesome')
+    await orm.create_pool(loop = loop,host='192.168.181.129',port=3306,user='root',password='zjbaaa',db='awesome')
 
     app = web.Application(loop = loop,middlewares=[logger_factory,response_factory])
     init_jinja2(app,filters=dict(datetime=datetime_filter))
