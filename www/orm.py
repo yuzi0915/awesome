@@ -189,8 +189,6 @@ class Model(dict,metaclass=ModelMetaclass):
     async def save(self):
         args = list(map(self.getValueOrDefault,self.__fields__))
         args.append(self.getValueOrDefault(self.__primary_key__))
-        logging.info(args)
-        logging.warning(args)
         logging.warning(self.__insert__)
         rows = await execute(self.__insert__,args)
 

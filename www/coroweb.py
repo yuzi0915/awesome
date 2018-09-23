@@ -20,16 +20,14 @@ def get(path):
 def post(path):
     '''
     Define decorator @post('/path')
-    :param path:
-    :return:
     '''
     def decotator(func):
         @functools.wraps(func)
         def wrapper(*args, **kw):
             return func(*args, **kw)
-
-        wrapper.__methed__ = 'POST'
+        wrapper.__method__ = 'POST'
         wrapper.__route__ = path
+        return wrapper
     return decotator
 
 
@@ -89,17 +87,17 @@ class RequestHander(object):
                 if not request.content_type:
                     return web.HTTPBadRequest('Missing Content-type.')
                 ct = request.content_type.lower()
-                if ct.startswitch('application/json'):
+                if ct.startswith('application/json'):
                     params = await request.json()
                     if not isinstance(params,dict):
                         return web.HTTPBadRequest('JSON body must be object')
                     kw = params
-                elif ct.startswitch('application/x-www-form-urlencoded') or ct.startswitch('multipart/form-data'):
+                elif ct.startswith('application/x-www-form-urlencoded') or ct.startswitch('multipart/form-data'):
                     params = await request.post()
                     kw = dict(**params)
                 else:
                     return web.HTTPBadRequest('Unsupport Content-type:%s'% request.content_type)
-            if request.methed == 'GET':
+            if request.method == 'GET':
                 qs = request.query_string
                 if qs:
                     kw = dict()
@@ -141,7 +139,6 @@ def add_static(app):
     app.router.add_static('/static/',path)
     lg.info('add static %s => %s '%('/static/',path))
 def add_router(app,fn):
-    logging.info('start add_router:%s'%fn)
     method = getattr(fn,'__method__',None)
     path = getattr(fn,'__route__',None)
     if path is None or method is None:
@@ -152,7 +149,6 @@ def add_router(app,fn):
     app.router.add_route(method,path,RequestHander(app,fn))
 
 def add_routers(app,module_name):
-    logging.info('start add_routers')
     n = module_name.rfind('.')
     if n == (-1):
         mod = __import__(module_name,globals(),locals())
@@ -169,3 +165,9 @@ def add_routers(app,module_name):
             if method and path:
                 add_router(app,fn)
 
+# @post('haha')
+# def test():
+#     pass
+#
+#
+# print(test.__method__)
