@@ -177,8 +177,23 @@ class Model(dict,metaclass=ModelMetaclass):
                 args.append(limit)
             else:
                 raise ValueError('Invalid limit value : %s' % str(limit))
-        rs = await select(' '.join(sql),args)
+
+        rs = await select(' '.join(sql),args[0])
         return [cls(**r) for r in rs]
+    @classmethod
+    async def findNumber(cls,selectField,where = None,args=None):
+        sql = ['select %s from `%s`' %(selectField,cls.__table__)]
+        if where:
+            sql.append('where')
+            sql.append(where)
+        rs = await select(' '.join(sql),args,1)
+
+        if len(rs) == 0:
+            return None
+        num = rs[0][selectField]
+        print('num:%s'%num)
+        return num
+
     @classmethod
     async def find(cls,pk):
         rs = await select('%s where `%s`=?'%(cls.__select__,cls.__primary_key__),[pk],1)

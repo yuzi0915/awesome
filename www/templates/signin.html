@@ -26,13 +26,13 @@
                             email = this.email.trim().toLowerCase(),
                             data = {
                                 email: email,
-                                passwd: this.passwd === '' ? '' : CryptoJS.SHA1(email + ':' + this.passwd).toString()
+                                passwd: this.passwd === '' ? '' : CryptoJS.SHA1(email + ':' + this.passwd).toString(),
+                                __user__:''
                             };
                         $form.postJSON('/api/authenticate', data, function (err, result) {
                             if (!err) {
-                                //location.assign('/')
-                                a='<image src ='+result.image+'></image>'
-                                $('body').append(a)
+
+                                location.assign('/')
 
                             }
                         });
