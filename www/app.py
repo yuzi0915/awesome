@@ -8,7 +8,7 @@ from models import User,Blog,Comment
 from jinja2 import Environment,FileSystemLoader
 
 from coroweb import add_routers,add_static
-
+from handlers import COOKIE_NAME,cookie2user
 def init_jinja2(app,**kw):
     logging.info('init jinja2...')
     options = dict(
@@ -47,6 +47,28 @@ async def data_factory(app,handler):
                 logging.info('request form: %s' % str(request.__data__))
         return ( await handler(request))
     return  parse_data
+
+async def auth_factory(app,handler):
+    async def auth(requset):
+        logging.info('check user:%s %s'%(requset.method,requset.path))
+        requset.__user__ = None
+        cookie_str = requset.cookies.get(COOKIE_NAME)
+        logging.info('cookie_str:%s'% cookie_str)
+        if cookie_str:
+            user = await cookie2user(cookie_str)
+            if user:
+                logging.info('set current user: %s' % user.email)
+                requset.__user__ = user
+            if requset.path.startswith('/manage/') and (requset.__user__ is None or not  requset.__user__.admin):
+                return web.HTTPFound('/signin')
+            return await handler(requset)
+        else:
+            if requset.path.startswith('/manage/') and (requset.__user__ is None or not requset.__user__.admin):
+                return web.HTTPFound('/signin')
+            return await handler(requset)
+
+    return auth
+
 async def  response_factory(app,handler):
     async def response(request):
         logging.info('Response handler...')
@@ -105,7 +127,7 @@ def index(request):
 async def init(loop):
     await orm.create_pool(loop = loop,host='192.168.181.129',port=3306,user='root',password='zjbaaa',db='awesome')
 
-    app = web.Application(loop = loop,middlewares=[logger_factory,response_factory])
+    app = web.Application(loop = loop,middlewares=[logger_factory,response_factory, auth_factory])
     init_jinja2(app,filters=dict(datetime=datetime_filter))
     add_routers(app,'handlers')
     add_static(app)
