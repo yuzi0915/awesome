@@ -10,10 +10,10 @@
                 page:data.page
             },
             methods:{
-                edit_blog:function (blog) {
+                set_admin:function (blog) {
                     location.assign('/manage/blogs/edit?id='+blog.id)
                 },
-                delete_blog:function (blog) {
+                delete_user:function (blog) {
                     if(confirm('确认要删除“'+blog.name+'"?删除后不可回复！')){
                         postJSON('/api/blogs/'+blog.id+'/delete',function (err,r) {
                             if(err){
@@ -85,8 +85,8 @@
                 <span v-text="blog.created_at.toDateTime()"></span>
             </td>
             <td>
-                <a href="#0" v-on="click: edit_blog(blog)"><i class="uk-icon-edit"></i></a>
-                <a href="#0" v-on="click: delete_blog(blog)"><i class="uk-icon-trash-o"></i></a>
+                <a href="#0" v-on="click: set_admin(blog)"><i class="uk-icon-edit"></i></a>
+                <a href="#0" v-on="click: delete_user(blog)"><i class="uk-icon-trash-o"></i></a>
             </td>
         </tr>
         </tbody>
