@@ -1,5 +1,11 @@
+
+
+
+
 from handler_help import *
 
+_RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
+_RE_SHA1 = re.compile(r'[0-9a-f]{40}')
 
 @post('/api/authenticate')
 async def authenticate(*, email, passwd):
@@ -27,7 +33,7 @@ async def authenticate(*, email, passwd):
 
 
 @post('/api/users')
-async def api_get_users(*, email, name, passwd):
+async def api_create_users(*, email, name, passwd):
     if not name or not name.strip():
         raise APIValueError('name')
     if not email or not _RE_EMAIL.match(email):
@@ -61,7 +67,7 @@ async def api_create_blog(request, *, name, summary, content):
     for r in request:
         print(r)
     check_admin(request)
-    if not name or name.strip():
+    if not name or not name.strip():
         raise APIValueError('name', 'name cannot be empty')
     if not summary or not summary.strip():
         raise APIValueError('summary', 'summay cannot be empty')
@@ -71,7 +77,30 @@ async def api_create_blog(request, *, name, summary, content):
                 name=name.strip(), summary=summary.strip(), content=content.strip())
     await blog.save()
     return blog
+@post('/api/blogs/{id}/update')
+async def api_edit_blog(id,request, *, name, summary, content):
+    for r in request:
+        print(r)
+    check_admin(request)
+    blog = await Blog.find(id)
+    if not name or not name.strip():
+        raise APIValueError('name', 'name cannot be empty')
+    if not summary or not summary.strip():
+        raise APIValueError('summary', 'summay cannot be empty')
+    if not content or not content.strip():
+        raise APIValueError('content', 'content cannot be empty')
+    blog.name = name
+    blog.summary = summary
+    blog.content = content
+    await blog.update()
+    return blog
 
+@post('/api/blogs/{id}/delete')
+async def api_delete_blog(id,request):
+    check_admin(request)
+    blog = await Blog.find(id)
+    await blog.remove()
+    return blog
 
 @get('/api/blogs')
 async def api_blogs(*, page='1'):
@@ -84,3 +113,17 @@ async def api_blogs(*, page='1'):
     logging.warning((p.offset, p.limit))
     blogs = await Blog.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
     return dict(page=p, blogs=blogs)
+
+
+@get('/api/users')
+async def api_get_users(request, *, page='1'):
+    check_admin(request)
+    page_index = get_page_index(page)
+    num = await User.findNumber('count(id)')
+    print(num)
+    p = Page(num, page_index)
+    if num == 0:
+        return dict(page=p, users=())
+    logging.warning((p.offset, p.limit))
+    users = await User.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
+    return dict(page=p, users=users)

@@ -1,18 +1,28 @@
+# 注册页：GET / register
+#
+# 登录页：GET / signin
+#
+# 注销页：GET / signout
+#
+# 首页：GET /
+#
+# 日志详情页：GET / blog /: blog_id
+
+
+
+
 from handler_help import *
 
+_RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
+_RE_SHA1 = re.compile(r'[0-9a-f]{40}')
 
 @get('/')
 async def index(request):
-    summary = 'Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.'
-    blogs = [
-        Blog(id='1', name='Test Blog', summary=summary, created_at=time.time() - 120),
-        Blog(id='1', name='Test Blog', summary=summary, created_at=time.time() - 3600),
-        Blog(id='1', name='Test Blog', summary=summary, created_at=time.time() - 7200),
-    ]
+    blogs = await Blog.findAll()
     return {
         '__template__': 'blogs.html',
         'blogs': blogs,
-        '__user__': request.__user__
+
     }
 
 
@@ -51,5 +61,5 @@ async def get_blog(id, request):
         '__template__': 'blog.html',
         'blog': blog,
         'comments': comments,
-        '__user__': request.__user__
+
     }

@@ -73,6 +73,7 @@ async def  response_factory(app,handler):
     async def response(request):
         logging.info('Response handler...')
         r = await handler(request)
+
         if isinstance(r,web.StreamResponse):
             return r
         if isinstance(r,bytes):
@@ -86,6 +87,7 @@ async def  response_factory(app,handler):
             resp.content_type = 'text/html;charset = utf-8'
             return resp
         if isinstance(r,dict):
+            r.__setitem__('__user__',request.__user__)
             template = r.get('__template__')
             if template is None:
                 resp = web.Response(body=json.dumps(r,ensure_ascii =False,default=lambda o:o.__dict__).encode('utf-8'))
@@ -132,7 +134,7 @@ async def init(loop):
     add_routers(app,'handlers')
     add_static(app)
     srv = await loop.create_server(app.make_handler(),'192.168.181.129',9000)
-    logging.info('server started at http://127.0.0.1:9000...')
+    logging.info('server started at http://192.168.181.129:9000...')
     return srv
 
 

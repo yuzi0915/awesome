@@ -213,10 +213,11 @@ class Model(dict,metaclass=ModelMetaclass):
 
     async def update(self):
         args = list(map(self.getValue,self.__fields__))
-        args.append(self.getvalue(self.__primary_key__))
+        args.append(self.getValue(self.__primary_key__))
         rows = await execute(self.__update__,args)
         if rows != 1:
             logging.warning('failed to update by primary key:affected rows:%s' %rows)
+
 
     async def remove(self):
         args = [self.getValue(self.__primary_key__)]
