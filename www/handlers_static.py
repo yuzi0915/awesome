@@ -1,4 +1,4 @@
-from .handlershelp import *
+from handler_help import *
 
 
 @get('/')
