@@ -7,8 +7,11 @@
         <h2><a href="/blog/{{blog.id}}">{{ blog.name }}</a></h2>
         <p class="uk-article-meta">发表于{{ blog.created_at|datetime }}</p>
         <p>{{blog.summary}}</p>
-    </article>
+
     <hr class="uk-article-divider">
+    {% for content in blog.html_content %}
+        <p>{{content}}</p>
+    {% endfor %}
 
 </div>
 <div class="uk-width-medium-1-4">
