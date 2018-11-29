@@ -7,9 +7,15 @@
             font-size:0.4in; 
             line-height: 0.6in; 
             margin-top:0.5in;
+            margin-left:1in;
+            margin-right:1in;
+            margin-left:1in;
         }
         h2{
-            font-size:40pt  
+            margin-left:1in;  
+        }
+        time{
+            margin-left:1in;
         }
     </style>
 {% endif %}
@@ -52,7 +58,7 @@
         <article>
                <template v-repeat="blog:blogs">
                         <a   v-attr="href: '/blog/'+blog.id"><h2 style="color:#345ce0;"target="_blank"  v-text="blog.name"></h2></a>
-                        <span v-text="blog.created_at.toDateTime()"></span> 
+                        <span class = "time"v-text="blog.created_at.toDateTime()"></span> 
                         
                         <template v-repeat="content:blog.html_content">
                                 <p class="cont"  v-text ="content" ></p>
