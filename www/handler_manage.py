@@ -9,7 +9,7 @@ from handler_help import *
 _RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
 _RE_SHA1 = re.compile(r'[0-9a-f]{40}')
 @get('/manage/blogs')
-def manage_blogs(*, page='1'):
+async def manage_blogs(*, page='1'):
     return {
         '__template__': 'manage_blogs.html',
         'page_index': get_page_index(page)
@@ -17,7 +17,7 @@ def manage_blogs(*, page='1'):
 
 
 @get('/manage/blogs/create')
-def manage_create_blog():
+async def manage_create_blog():
     return {
         '__template__': 'manage_blog_edit.html',
         'id': '',
@@ -32,7 +32,7 @@ async def manage_edit_blog(*,id):
         'action': '/api/blogs/%s/update'%id
     }
 @get('/manage/users')
-def manage_users(*,page='1'):
+async def manage_users(*,page='1'):
     return {
         '__template__': 'manage_users.html',
         'page_index': get_page_index(page)

@@ -14,9 +14,11 @@ _RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$'
 _RE_SHA1 = re.compile(r'[0-9a-f]{40}')
 
 def check_admin(request):
-    if request.__user__ is None or not request.__user__.admin:
+    if request.__user__ is None or request.__user__.admin != 1:
         raise APIPermissionError()
-
+def check_add(request):
+    if request.__user__ is None or not request.__user__.admin :
+        raise APIPermissionError()
 
 def text2html(text):
     lines = map(lambda s: '<p>%s</p>' % s.replace('&', '&amp').replace('<', '&lt;').replace('>', '&gt;'),

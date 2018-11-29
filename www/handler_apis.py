@@ -3,7 +3,7 @@
 
 
 from handler_help import *
-
+_RE_RS = re.compile(r'.*')
 _RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
 _RE_SHA1 = re.compile(r'[0-9a-f]{40}')
 
@@ -66,7 +66,7 @@ async def api_get_blog(*, id):
 async def api_create_blog(request, *, name, summary, content):
     for r in request:
         print(r)
-    check_admin(request)
+    check_add(request)
     if not name or not name.strip():
         raise APIValueError('name', 'name cannot be empty')
     if not summary or not summary.strip():
@@ -112,6 +112,8 @@ async def api_blogs(*, page='1'):
         return dict(page=p, blogs=())
     logging.warning((p.offset, p.limit))
     blogs = await Blog.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
+    for blog in blogs:
+        blog.html_content = _RE_RS.findall(blog.content)
     return dict(page=p, blogs=blogs)
 
 
@@ -127,3 +129,10 @@ async def api_get_users(request, *, page='1'):
     logging.warning((p.offset, p.limit))
     users = await User.findAll(orderBy='created_at desc', limit=(p.offset, p.limit))
     return dict(page=p, users=users)
+
+@post('/api/users/{id}/delete')
+async def api_delete_user(id,request):
+    check_admin(request)
+    user = await User.find(id)
+    await user.remove()
+    return user

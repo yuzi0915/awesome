@@ -13,16 +13,30 @@
 
 from handler_help import *
 
+_RE_RS = re.compile(r'.*')
 _RE_EMAIL = re.compile(r'^[a-z0-9\.\-\_]+\@[a-z0-9\-\_]+(\.[a-z0-9\-\_]+){1,4}$')
 _RE_SHA1 = re.compile(r'[0-9a-f]{40}')
 
 @get('/')
-async def index(request):
-    blogs = await Blog.findAll()
+async def index(request,*, page='1'):
+    # blogs = await Blog.findAll()
+    # for blog in blogs:
+    #     blog.html_content = _RE_RS.findall(blog.content)
+   
     return {
         '__template__': 'blogs.html',
-        'blogs': blogs,
-
+        # 'blogs': blogs,
+        'page_index': get_page_index(page),
+        
+    }
+@get('/donation')
+async def donation():
+    # blogs = await Blog.findAll()
+    # for blog in blogs:
+    #     blog.html_content = _RE_RS.findall(blog.content)
+    return {
+        '__template__': 'donation.html',
+       
     }
 
 
@@ -56,7 +70,9 @@ async def get_blog(id, request):
     comments = await Comment.findAll('blog_id=?', [id], orderBy='created_at desc')
     for c in comments:
         c.html_content = text2html(c.content)
-    blog.html_content = blog.content.split('\n')
+    #blog.html_content = markdown2.markdown(blog.content)
+    blog.html_content = _RE_RS.findall(blog.content)
+  
     return {
         '__template__': 'blog.html',
         'blog': blog,

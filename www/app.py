@@ -6,9 +6,13 @@ import aiomysql
 import orm
 from models import User,Blog,Comment
 from jinja2 import Environment,FileSystemLoader
-
+import re
 from coroweb import add_routers,add_static
 from handlers import COOKIE_NAME,cookie2user
+
+
+_RE_MO = re.compile(r'Android|iPhone')
+
 def init_jinja2(app,**kw):
     logging.info('init jinja2...')
     options = dict(
@@ -87,7 +91,19 @@ async def  response_factory(app,handler):
             resp.content_type = 'text/html;charset = utf-8'
             return resp
         if isinstance(r,dict):
+            isMobile = 1
+            print(request.headers['User-Agent'])
+            Mobile = _RE_MO.findall(request.headers['User-Agent']) 
+            print(Mobile)
+            if len(Mobile) == 0:
+                isMobile = -1
+        
+            print('ismobile is %s' %isMobile)
             r.__setitem__('__user__',request.__user__)
+
+
+
+            r.__setitem__('isMobile',isMobile)
             template = r.get('__template__')
             if template is None:
                 resp = web.Response(body=json.dumps(r,ensure_ascii =False,default=lambda o:o.__dict__).encode('utf-8'))
@@ -127,13 +143,13 @@ def index(request):
 
 
 async def init(loop):
-    await orm.create_pool(loop = loop,host='127.0.0.1',port=3306,user='root',password='zjbaaa',db='awesome')
+    await orm.create_pool(loop = loop,host='127.0.0.1',port=3306, user='root',password='zjbaaa',db='awesome')
 
     app = web.Application(loop = loop,middlewares=[logger_factory,response_factory, auth_factory])
     init_jinja2(app,filters=dict(datetime=datetime_filter))
     add_routers(app,'handlers')
     add_static(app)
-    srv = await loop.create_server(app.make_handler(),'127.0.0.1',9000)
+    srv = await loop.create_server(app.make_handler(),'192.168.0.107',80)
     logging.info('server started at http://127.0.0.1:9000...')
     return srv
 

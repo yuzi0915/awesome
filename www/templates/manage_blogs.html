@@ -10,10 +10,10 @@
                 page:data.page
             },
             methods:{
-                set_admin:function (blog) {
+                edit_blog:function (blog) {
                     location.assign('/manage/blogs/edit?id='+blog.id)
                 },
-                delete_user:function (blog) {
+                delete_blog:function (blog) {
                     if(confirm('确认要删除“'+blog.name+'"?删除后不可回复！')){
                         postJSON('/api/blogs/'+blog.id+'/delete',function (err,r) {
                             if(err){
@@ -43,7 +43,7 @@
 </script>
 {% endblock %}
 {% block content %}
-
+{% if __user__.admin==1 %}
 <div class="uk-width-1-1 uk-margin-bottom">
     <div class="uk-panel uk-panel-box">
         <ul class="uk-breadcrumb">
@@ -53,7 +53,7 @@
         </ul>
     </div>
 </div>
-
+{% endif %}
 <div id="error" class="uk-width-1-1">
 </div>
 
@@ -63,7 +63,7 @@
 
 <div id="vm" class="uk-width-1-1">
     <a href="/manage/blogs/create" class="uk-button uk-button-primary"><i class="uk-icon-plus"></i> 新日志</a>
-
+    
     <table class="uk-table uk-table-hover">
         <thead>
         <tr>
@@ -85,14 +85,18 @@
                 <span v-text="blog.created_at.toDateTime()"></span>
             </td>
             <td>
-                <a href="#0" v-on="click: set_admin(blog)"><i class="uk-icon-edit"></i></a>
-                <a href="#0" v-on="click: delete_user(blog)"><i class="uk-icon-trash-o"></i></a>
+                <a href="#0" v-on="click: edit_blog(blog)"><i class="uk-icon-edit"></i></a>
+                
+                <a href="#0" v-on="click: delete_blog(blog)"><i class="uk-icon-trash-o"></i></a>
+               
+                
             </td>
         </tr>
         </tbody>
     </table>
-
+    
     <div v-component="pagination" v-with="page"></div>
+    
 </div>
 
 {% endblock %}
