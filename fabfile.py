@@ -4,7 +4,7 @@ from fabric.api import *
 
 env.user = 'ubuntu'
 env.sudo_user = 'root'
-env.hosts = ['18.224.15.13']
+env.hosts = ['  *.*.*.*']
 
 db_user = 'root'
 db_password = 'zjbaaa'
